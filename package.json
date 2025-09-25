@@ -1,0 +1,19 @@
+{
+  "name": "sproutpay",
+  "private": true,
+  "workspaces": [
+    "api",
+    "frontend"
+  ],
+  "scripts": {
+    "dev:api": "cd api && bun run dev",
+    "dev:frontend": "cd frontend && bun run dev",
+    "dev": "concurrently \"bun dev:api\" \"bun dev:frontend\"",
+    "build:api": "cd api && bun run build",
+    "build:frontend": "cd frontend && bun run build",
+    "build": "bun run build:api && bun run build:frontend"
+  },
+  "devDependencies": {
+    "concurrently": "^8.2.2"
+  }
+}
