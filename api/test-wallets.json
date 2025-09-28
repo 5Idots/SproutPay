@@ -1,0 +1,14 @@
+{
+  "alice": {
+    "name": "Alice",
+    "address": "0xB620a4E2e5257A3be3df20A88F3C0E7F944Fa0Ad",
+    "privateKey": "0xb84f7ee9c2d55315008419d116a5f66d307e4c641743ec9a32732794bdd1b654",
+    "role": "Receiver (creates payment links)"
+  },
+  "bob": {
+    "name": "Bob",
+    "address": "0x819dAE4eB1703174dD1D8E13f18bb73E5c05B827",
+    "privateKey": "0xbca530ca9f6221b69c334d6edb89e7d48b1277437113241158df1d929933e3cc",
+    "role": "Payer (accepts payment links)"
+  }
+}

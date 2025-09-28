@@ -1,0 +1,135 @@
+import { Hono } from 'hono'
+import { zValidator } from '@hono/zod-validator'
+import { z } from 'zod'
+import { eq } from 'drizzle-orm'
+import { db, payments, users } from '../lib/database'
+
+const app = new Hono()
+
+// Validation schemas
+const createPaymentSchema = z.object({
+  fromUserId: z.string().uuid(),
+  toUsername: z.string().min(1).max(50),
+  fromAsset: z.string().min(1).max(10),
+  toAsset: z.string().min(1).max(10),
+  fromAmount: z.string().regex(/^\d+\.?\d*$/, 'Invalid amount format'),
+  toAmount: z.string().regex(/^\d+\.?\d*$/, 'Invalid amount format'),
+  fromChain: z.string().min(1).max(50),
+  toChain: z.string().min(1).max(50),
+  securityLevel: z.enum(['standard', 'timelock', 'multisig']).default('standard'),
+  timeLockHours: z.number().min(1).max(168).optional(), // Max 1 week
+})
+
+// POST /api/payments - Create new payment
+app.post('/', zValidator('json', createPaymentSchema), async (c) => {
+  try {
+    const validatedData = c.req.valid('json')
+
+    // Verify sender exists
+    const [sender] = await db
+      .select()
+      .from(users)
+      .where(eq(users.id, validatedData.fromUserId))
+      .limit(1)
+
+    if (!sender) {
+      return c.json({
+        error: 'Sender not found'
+      }, 404)
+    }
+
+    // Resolve recipient username
+    const [recipient] = await db
+      .select()
+      .from(users)
+      .where(eq(users.username, validatedData.toUsername))
+      .limit(1)
+
+    if (!recipient) {
+      return c.json({
+        error: `User @${validatedData.toUsername} not found`
+      }, 404)
+    }
+
+    // Calculate timelock expiry if needed
+    let timeLockExpiry = null
+    if (validatedData.securityLevel === 'timelock' && validatedData.timeLockHours) {
+      timeLockExpiry = new Date(Date.now() + validatedData.timeLockHours * 60 * 60 * 1000)
+    }
+
+    // Create payment
+    const [newPayment] = await db
+      .insert(payments)
+      .values({
+        fromUserId: validatedData.fromUserId,
+        toUsername: validatedData.toUsername,
+        toUserId: recipient.id,
+        fromAsset: validatedData.fromAsset,
+        toAsset: validatedData.toAsset,
+        fromAmount: validatedData.fromAmount,
+        toAmount: validatedData.toAmount,
+        fromChain: validatedData.fromChain,
+        toChain: validatedData.toChain,
+        securityLevel: validatedData.securityLevel,
+        timeLockExpiry,
+        multisigRequired: validatedData.securityLevel === 'multisig',
+      })
+      .returning()
+
+    return c.json({
+      success: true,
+      payment: {
+        id: newPayment.id,
+        toUsername: newPayment.toUsername,
+        fromAsset: newPayment.fromAsset,
+        toAsset: newPayment.toAsset,
+        fromAmount: newPayment.fromAmount,
+        toAmount: newPayment.toAmount,
+        fromChain: newPayment.fromChain,
+        toChain: newPayment.toChain,
+        status: newPayment.status,
+        securityLevel: newPayment.securityLevel,
+        timeLockExpiry: newPayment.timeLockExpiry,
+        createdAt: newPayment.createdAt,
+      }
+    })
+  } catch (error: any) {
+    console.error('Create payment error:', error)
+    return c.json({
+      error: 'Internal server error',
+      message: error.message
+    }, 500)
+  }
+})
+
+// GET /api/payments/:id - Get payment by ID
+app.get('/:id', async (c) => {
+  try {
+    const id = c.req.param('id')
+
+    const [payment] = await db
+      .select()
+      .from(payments)
+      .where(eq(payments.id, id))
+      .limit(1)
+
+    if (!payment) {
+      return c.json({
+        error: 'Payment not found'
+      }, 404)
+    }
+
+    return c.json({
+      success: true,
+      payment
+    })
+  } catch (error: any) {
+    console.error('Get payment error:', error)
+    return c.json({
+      error: 'Internal server error',
+      message: error.message
+    }, 500)
+  }
+})
+
+export default app

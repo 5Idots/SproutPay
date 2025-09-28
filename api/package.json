@@ -1,0 +1,43 @@
+{
+  "name": "sprout-hono-api",
+  "version": "1.0.0",
+  "type": "module",
+  "scripts": {
+    "dev": "bun --hot src/index.ts",
+    "start": "bun src/index.ts",
+    "db:generate": "drizzle-kit generate",
+    "db:migrate": "drizzle-kit migrate",
+    "db:studio": "drizzle-kit studio",
+    "db:seed": "bun run src/database/seed.ts",
+    "testnet:setup": "./scripts/setup-testnet.sh",
+    "testnet:test": "bun run scripts/test-yellow-integration.ts",
+    "testnet:wallet": "bun run scripts/generate-test-wallet.ts",
+    "testnet:tokens": "bun run scripts/get-yellow-testnet-tokens.ts",
+    "testnet:scenario": "bun run scripts/generate-test-scenario.ts",
+    "testnet:fund": "bun run scripts/fund-test-wallets.ts",
+    "testnet:service": "bun run scripts/fund-service-wallet.ts",
+    "get-service-address": "bun run scripts/get-service-address.ts",
+    "check-service-balance": "bun run scripts/check-service-balance.ts",
+    "check-test-balances": "bun run scripts/check-test-wallet-balances.ts",
+    "setup-test-wallets": "bun run scripts/setup-cross-chain-test-wallets.ts",
+    "test:e2e": "bun run scripts/test-end-to-end-flow.ts",
+    "testnet:start": "./scripts/start-testnet.sh"
+  },
+  "dependencies": {
+    "@erc7824/nitrolite": "^0.3.0",
+    "@hono/node-server": "^1.12.0",
+    "@hono/zod-validator": "^0.2.2",
+    "drizzle-orm": "^0.44.5",
+    "hono": "^4.5.8",
+    "ioredis": "^5.7.0",
+    "postgres": "^3.4.7",
+    "viem": "^2.37.7",
+    "ws": "^8.18.3",
+    "zod": "^4.1.11"
+  },
+  "devDependencies": {
+    "drizzle-kit": "^0.31.4",
+    "@types/ws": "^8.5.12",
+    "bun-types": "latest"
+  }
+}

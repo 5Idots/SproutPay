@@ -1,0 +1,130 @@
+import { Hono } from 'hono'
+import { zValidator } from '@hono/zod-validator'
+import { z } from 'zod'
+import { eq } from 'drizzle-orm'
+import { db, users } from '../lib/database'
+import { validateWalletAddress } from '../lib/wallet-validation'
+
+const app = new Hono()
+
+// Validation schemas
+const createUserSchema = z.object({
+  username: z.string().min(3).max(50).regex(/^[a-zA-Z0-9_]+$/, 'Username can only contain letters, numbers, and underscores'),
+  walletAddress: z.string().regex(/^0x[a-fA-F0-9]{40}$/, 'Invalid wallet address format'),
+  email: z.string().email().optional(),
+  phone: z.string().optional(),
+  preferredAssets: z.array(z.string()).optional(),
+})
+
+// POST /api/users - Create new user
+app.post('/', zValidator('json', createUserSchema), async (c) => {
+  try {
+    const validatedData = c.req.valid('json')
+
+    // Validate wallet address on-chain
+    const walletValidation = await validateWalletAddress(validatedData.walletAddress)
+    if (!walletValidation.isValid) {
+      return c.json({
+        error: 'Invalid wallet address'
+      }, 400)
+    }
+
+    // Check if username already exists
+    const existingUsername = await db
+      .select()
+      .from(users)
+      .where(eq(users.username, validatedData.username))
+      .limit(1)
+
+    if (existingUsername.length > 0) {
+      return c.json({
+        error: 'Username already exists'
+      }, 409)
+    }
+
+    // Check if wallet address already exists
+    const existingWallet = await db
+      .select()
+      .from(users)
+      .where(eq(users.walletAddress, validatedData.walletAddress))
+      .limit(1)
+
+    if (existingWallet.length > 0) {
+      return c.json({
+        error: 'Wallet address already registered'
+      }, 409)
+    }
+
+    // Create new user
+    const [newUser] = await db
+      .insert(users)
+      .values({
+        username: validatedData.username,
+        walletAddress: validatedData.walletAddress,
+        email: validatedData.email || null,
+        phone: validatedData.phone || null,
+        preferredAssets: validatedData.preferredAssets || null,
+      })
+      .returning()
+
+    return c.json({
+      success: true,
+      user: {
+        id: newUser.id,
+        username: newUser.username,
+        walletAddress: newUser.walletAddress,
+        isVerified: newUser.isVerified,
+        preferredAssets: newUser.preferredAssets,
+      },
+      walletInfo: {
+        isContract: walletValidation.isContract,
+        hasActivity: walletValidation.hasActivity,
+      }
+    })
+  } catch (error: any) {
+    console.error('Create user error:', error)
+    return c.json({
+      error: 'Internal server error',
+      message: error.message
+    }, 500)
+  }
+})
+
+// GET /api/users/:username - Get user by username
+app.get('/:username', async (c) => {
+  try {
+    const username = c.req.param('username')
+
+    const [user] = await db
+      .select({
+        id: users.id,
+        username: users.username,
+        walletAddress: users.walletAddress,
+        isVerified: users.isVerified,
+        preferredAssets: users.preferredAssets,
+        createdAt: users.createdAt,
+      })
+      .from(users)
+      .where(eq(users.username, username))
+      .limit(1)
+
+    if (!user) {
+      return c.json({
+        error: 'User not found'
+      }, 404)
+    }
+
+    return c.json({
+      success: true,
+      user
+    })
+  } catch (error: any) {
+    console.error('Get user error:', error)
+    return c.json({
+      error: 'Internal server error',
+      message: error.message
+    }, 500)
+  }
+})
+
+export default app
