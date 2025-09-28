@@ -26,7 +26,7 @@ export default function HomePage() {
   }
 
   return (
-    <div className="min-h-screen bg-background relative overflow-hidden page-enter">
+    <div className="min-h-screen bg-background relative overflow-x-hidden page-enter">
       {/* Animated background elements */}
       <div className="absolute inset-0 bg-grid-pattern opacity-30"></div>
       <div className="floating-particles">
@@ -59,7 +59,7 @@ export default function HomePage() {
       </header>
 
       {/* Hero Section */}
-      <section className="container mx-auto px-6 py-24 max-w-7xl relative">
+      <section className="container mx-auto px-4 sm:px-6 py-16 sm:py-24 max-w-7xl relative">
         <div className="grid lg:grid-cols-2 gap-20 items-center">
           <div className="text-center lg:text-left stagger-item">
             <div className="inline-flex items-center gap-2 bg-primary/10 border border-primary/20 rounded-full px-4 py-2 mb-8">
@@ -67,13 +67,13 @@ export default function HomePage() {
               <span className="text-sm font-medium text-primary">Built on ERC-7824 Protocol</span>
             </div>
 
-            <h1 className="text-6xl lg:text-7xl font-bold mb-8 text-balance leading-tight font-heading">
+            <h1 className="fluid-heading-xl font-bold mb-8 text-balance font-heading hyphens-none break-words">
               <span className="text-foreground">Crypto payments,</span>
               <br />
               <span className="text-primary">simplified.</span>
             </h1>
 
-            <p className="text-xl text-foreground mb-10 text-balance max-w-lg mx-auto lg:mx-0 leading-relaxed font-sans">
+            <p className="fluid-text-xl text-foreground mb-10 text-balance max-w-lg mx-auto lg:mx-0 font-sans">
               Send or receive any EVM token, across chains, with military-grade escrow protection.
             </p>
 
@@ -81,7 +81,7 @@ export default function HomePage() {
               <Link href="/create">
                 <Button
                   size="lg"
-                  className="h-16 px-10 text-lg font-semibold min-w-[180px] bg-primary hover:bg-primary/90 text-primary-foreground glow-primary smooth-transition hover-lift btn-animate"
+                  className="fluid-btn-lg font-semibold bg-primary hover:bg-primary/90 text-primary-foreground glow-primary smooth-transition hover-lift btn-animate"
                 >
                   Create Payment Link
                 </Button>
@@ -90,7 +90,7 @@ export default function HomePage() {
                 <Button
                   variant="outline"
                   size="lg"
-                  className="h-16 px-10 text-lg font-semibold min-w-[180px] border-2 border-accent/30 hover:border-accent/60 bg-accent/5 hover:bg-accent/10 text-accent hover:text-accent smooth-transition hover-lift btn-animate"
+                  className="fluid-btn-lg font-semibold border-2 border-accent/30 hover:border-accent/60 bg-accent/5 hover:bg-accent/10 text-accent hover:text-accent smooth-transition hover-lift btn-animate"
                 >
                   Track Payment
                 </Button>
@@ -147,8 +147,8 @@ export default function HomePage() {
       {/* Who it's for Section */}
       <section className="container mx-auto px-6 py-24 max-w-7xl">
         <div className="text-center mb-16 stagger-item">
-          <h2 className="text-4xl lg:text-5xl font-bold text-foreground mb-6">Who is Sprout for?</h2>
-          <p className="text-xl text-foreground max-w-3xl mx-auto leading-relaxed">
+          <h2 className="fluid-heading-lg font-bold text-foreground mb-6">Who is Sprout for?</h2>
+          <p className="fluid-text-xl text-foreground max-w-3xl mx-auto">
             The simplest way to move value onchain. No middlemen, no locked ecosystems, no guesswork.
           </p>
         </div>

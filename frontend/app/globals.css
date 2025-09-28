@@ -391,8 +391,8 @@
 }
 
 .btn-animate:active::before {
-  width: 300px;
-  height: 300px;
+  width: 100vw;
+  height: 100vw;
 }
 
 /* Enhanced animations for blockchain logos */
@@ -429,6 +429,70 @@
 /* Enhanced spinning animation for the main logo */
 .animate-spin-slow {
   animation: spin-enhanced 20s linear infinite;
+}
+
+/* Fluid Typography System */
+.fluid-heading-xl {
+  font-size: clamp(2.5rem, 8vw, 6rem); /* iPhone SE: ~40px, iPad: ~76.8px, Desktop: 96px */
+  line-height: clamp(1.1, 1.15, 1.2);
+}
+
+.fluid-heading-lg {
+  font-size: clamp(2rem, 6vw, 4rem); /* Scales between 32px and 64px */
+  line-height: clamp(1.1, 1.2, 1.3);
+}
+
+.fluid-text-xl {
+  font-size: clamp(1.125rem, 4vw, 1.5rem); /* Scales between 18px and 24px */
+  line-height: clamp(1.4, 1.5, 1.6);
+}
+
+.fluid-text-lg {
+  font-size: clamp(1rem, 3vw, 1.25rem); /* Scales between 16px and 20px */
+  line-height: clamp(1.4, 1.5, 1.6);
+}
+
+/* Mobile-specific improvements */
+@media (max-width: 640px) {
+  .text-center {
+    text-align: center !important;
+  }
+  
+  .container {
+    width: 100%;
+    padding-left: clamp(1rem, 4vw, 1.5rem);
+    padding-right: clamp(1rem, 4vw, 1.5rem);
+  }
+  
+  h1, h2, h3 {
+    word-wrap: break-word;
+    overflow-wrap: break-word;
+  }
+}
+
+/* Fluid button sizes */
+.fluid-btn-lg {
+  height: clamp(3rem, 8vw, 4rem); /* Scales from 48px to 64px */
+  padding-left: clamp(1.5rem, 4vw, 2.5rem);
+  padding-right: clamp(1.5rem, 4vw, 2.5rem);
+  font-size: clamp(0.875rem, 2.5vw, 1.125rem); /* 14px to 18px */
+  min-width: clamp(10rem, 25vw, 11.25rem); /* 160px to 180px */
+}
+
+/* Tablet optimizations */
+@media (min-width: 768px) and (max-width: 1024px) {
+  .fluid-heading-xl {
+    font-size: clamp(3.5rem, 7vw, 5rem);
+  }
+  
+  .fluid-heading-lg {
+    font-size: clamp(2.5rem, 5vw, 3.5rem);
+  }
+  
+  .fluid-btn-lg {
+    height: clamp(3.5rem, 6vw, 4rem);
+    font-size: clamp(1rem, 2vw, 1.125rem);
+  }
 }
 
 @keyframes spin-enhanced {
